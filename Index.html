@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joone Studio | Zero-Cost Ultra v7.0</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=JetBrains+Mono&display=swap');
+        
+        :root {
+            --studio-blue: #00f2ff;
+            --studio-purple: #7000ff;
+            --glass: rgba(10, 10, 10, 0.8);
+        }
+
+        body { 
+            font-family: 'Space Grotesk', sans-serif; 
+            background: #050505; 
+            color: #e5e7eb;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* The "Enterprise" Feel: Complex UI Elements */
+        .sidebar-glass { background: var(--glass); backdrop-filter: blur(40px); border-right: 1px solid rgba(255,255,255,0.05); }
+        .main-gradient { background: radial-gradient(circle at top right, rgba(112, 0, 255, 0.05), transparent); }
+        
+        /* Advanced Animations */
+        @keyframes sweep { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+        .scanning::after {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(0, 242, 255, 0.1), transparent);
+            animation: sweep 2s infinite;
+        }
+
+        .prose pre {
+            background: #000 !important;
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            border-radius: 1rem;
+            padding: 1.25rem;
+            position: relative;
+        }
+
+        /* File Upload Chip Styling */
+        .file-chip {
+            background: linear-gradient(to right, #111, #1a1a1a);
+            border: 1px solid rgba(255,255,255,0.1);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="flex h-screen w-full relative">
+        
+        <aside class="w-72 sidebar-glass hidden md:flex flex-col z-20">
+            <div class="p-6">
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-lg flex items-center justify-center text-black font-black">JS</div>
+                    <h1 class="font-bold tracking-tighter text-xl">JOONE STUDIO</h1>
+                </div>
+
+                <button onclick="newThread()" class="w-full flex items-center justify-center gap-2 py-3 bg-white text-black rounded-xl font-bold hover:bg-cyan-400 transition-all shadow-lg shadow-cyan-500/10">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-width="2" stroke-linecap="round"/></svg>
+                    New Thread
+                </button>
+            </div>
+
+            <div class="px-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Memory Clusters</div>
+            <div id="thread-list" class="flex-1 overflow-y-auto px-2 space-y-1">
+                </div>
+
+            <div class="p-4 border-t border-white/5">
+                <div class="bg-blue-500/5 p-4 rounded-2xl border border-blue-500/10">
+                    <p class="text-[10px] font-bold text-blue-400 uppercase">Credit Status</p>
+                    <div class="flex items-center gap-2 mt-1">
+                        <div class="h-1.5 flex-1 bg-gray-800 rounded-full overflow-hidden">
+                            <div class="h-full bg-blue-500 w-[100%]"></div>
+                        </div>
+                        <span class="text-[10px] font-bold italic">FREE TIER</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="flex-1 flex flex-col main-gradient relative">
+            
+            <header class="h-16 flex items-center justify-between px-8 border-b border-white/5 bg-black/20">
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2 px-3 py-1.5 bg-gray-900 rounded-full border border-white/10">
+                        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                        <select id="engine-select" class="bg-transparent text-[10px] font-black uppercase tracking-widest outline-none cursor-pointer">
+                            <option value="google/gemini-2.0-flash-lite-preview:free">Gemini Flash (Free)</option>
+                            <option value="mistralai/mistral-7b-instruct:free">Mistral 7B (Free)</option>
+                            <option value="meta-llama/llama-3-8b-instruct:free">Llama 3 (Free)</option>
+                            <option value="openchat/openchat-7b:free">OpenChat (Free)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button onclick="toggleConfig()" class="p-2 text-gray-400 hover:text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" stroke-width="2" stroke-linecap="round"/></svg>
+                </button>
+            </header>
+
+            <div id="canvas" class="flex-1 overflow-y-auto p-6 md:p-12 space-y-10 scroll-smooth">
+                </div>
+
+            <div class="p-6 md:p-10">
+                <div class="max-w-4xl mx-auto">
+                    <div id="file-tray" class="flex flex-wrap gap-2 mb-4"></div>
+
+                    <div class="relative bg-[#0d0d0d] border border-white/10 rounded-3xl p-2 focus-within:border-cyan-500/50 transition-all shadow-2xl">
+                        <textarea id="main-input" rows="1" placeholder="Type a message or drop files..." class="w-full bg-transparent p-4 outline-none resize-none font-medium pr-20" oninput="resizeInput(this)"></textarea>
+                        
+                        <div class="absolute right-4 bottom-4 flex items-center gap-2">
+                            <input type="file" id="upload-gate" class="hidden" multiple onchange="handleUpload(this.files)">
+                            <button onclick="document.getElementById('upload-gate').click()" class="p-2 text-gray-500 hover:text-cyan-400">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" stroke-width="2" stroke-linecap="round"/></svg>
+                            </button>
+                            <button onclick="launchRequest()" class="bg-white text-black p-3 rounded-2xl hover:bg-cyan-400 transition-all active:scale-90">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke-width="3" stroke-linecap="round"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="config-modal" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-xl flex items-center justify-center p-6">
+        <div class="bg-[#111] border border-white/10 w-full max-w-md rounded-[2.5rem] p-10">
+            <h2 class="text-2xl font-bold mb-6 italic underline decoration-cyan-500">System Link</h2>
+            <div class="space-y-4">
+                <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">OpenRouter Key</label>
+                <input type="password" id="api-key-field" class="w-full bg-black border border-white/10 p-4 rounded-xl outline-none focus:border-cyan-500 transition-all" placeholder="Enter key for free model access...">
+            </div>
+            <button onclick="saveConfig()" class="w-full mt-8 py-4 bg-cyan-500 text-black font-bold rounded-xl shadow-lg shadow-cyan-500/20">Sync Neural Link</button>
+            <button onclick="toggleConfig()" class="w-full mt-2 text-gray-500 text-sm font-bold">Dismiss</button>
+        </div>
+    </div>
+
+    <script>
+        const Core = {
+            db: JSON.parse(localStorage.getItem('joone_v7')) || { threads: [], active: null, key: '' },
+            isBusy: false,
+            files: []
+        };
+
+        function init() {
+            if(!Core.db.threads.length) newThread();
+            else Core.db.active = Core.db.threads[0].id;
+            document.getElementById('api-key-field').value = Core.db.key;
+            renderAll();
+        }
+
+        function newThread() {
+            const id = 'th_'+Date.now();
+            Core.db.threads.unshift({ id, title: 'Blank Slate', msgs: [] });
+            Core.db.active = id;
+            persist(); renderAll();
+        }
+
+        function handleUpload(files) {
+            const tray = document.getElementById('file-tray');
+            for(let f of files) {
+                Core.files.push(f.name);
+                const chip = document.createElement('div');
+                chip.className = "file-chip flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-bold text-cyan-400";
+                chip.innerHTML = `<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-width="2"/></svg> ${f.name}`;
+                tray.appendChild(chip);
+            }
+        }
+
+        async function launchRequest() {
+            const input = document.getElementById('main-input');
+            const txt = input.value.trim();
+            if(!txt || Core.isBusy || !Core.db.key) return;
+
+            const thread = Core.db.threads.find(t => t.id === Core.db.active);
+            thread.msgs.push({ role: 'user', content: txt, attachments: [...Core.files] });
+            const aiMsg = { role: 'assistant', content: '', type: 'text' };
+            thread.msgs.push(aiMsg);
+
+            input.value = ''; input.style.height = 'auto';
+            document.getElementById('file-tray').innerHTML = '';
+            Core.files = []; Core.isBusy = true;
+            renderChat();
+
+            try {
+                const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${Core.db.key}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model: document.getElementById('engine-select').value,
+                        messages: thread.msgs.slice(0,-1).map(m => ({ role: m.role, content: m.content })),
+                        stream: true
+                    })
+                });
+
+                const reader = res.body.getReader();
+                const decoder = new TextDecoder();
+                while(true) {
+                    const {done, value} = await reader.read();
+                    if(done) break;
+                    const chunk = decoder.decode(value);
+                    chunk.split('\n').forEach(line => {
+                        if(line.startsWith('data: ')) {
+                            try {
+                                const payload = JSON.parse(line.substring(6));
+                                aiMsg.content += payload.choices[0].delta.content || '';
+                                streamUI(aiMsg.content);
+                            } catch(e) {}
+                        }
+                    });
+                }
+            } catch(e) { aiMsg.content = "Connection refused. Check API key and network."; }
+            finally { 
+                Core.isBusy = false; 
+                if(thread.msgs.length === 2) thread.title = txt.substring(0, 20);
+                persist(); 
+            }
+        }
+
+        function streamUI(txt) {
+            const bubbles = document.querySelectorAll('.ai-bubble');
+            const last = bubbles[bubbles.length-1];
+            if(last) {
+                last.innerHTML = marked.parse(txt);
+                document.getElementById('canvas').scrollTop = document.getElementById('canvas').scrollHeight;
+                hljs.highlightAll();
+            }
+        }
+
+        function renderChat() {
+            const canvas = document.getElementById('canvas');
+            const thread = Core.db.threads.find(t => t.id === Core.db.active);
+            canvas.innerHTML = thread.msgs.map(m => `
+                <div class="flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}">
+                    <div class="${m.role === 'user' ? 'max-w-[80%] bg-[#111] border border-white/5 p-6 rounded-3xl rounded-br-none' : 'max-w-[90%] prose prose-invert ai-bubble'}">
+                        ${m.role === 'user' ? m.content : marked.parse(m.content || '...')}
+                    </div>
+                </div>
+            `).join('');
+            canvas.scrollTop = canvas.scrollHeight;
+            hljs.highlightAll();
+        }
+
+        function renderSidebar() {
+            document.getElementById('thread-list').innerHTML = Core.db.threads.map(t => `
+                <div onclick="switchThread('${t.id}')" class="p-3 rounded-xl cursor-pointer truncate text-[11px] font-bold uppercase tracking-tighter transition-all ${t.id === Core.db.active ? 'bg-white/5 text-cyan-400 border border-white/10' : 'text-gray-500 hover:text-white'}">
+                    ${t.title}
+                </div>
+            `).join('');
+        }
+
+        function renderAll() { renderSidebar(); renderChat(); }
+        function persist() { localStorage.setItem('joone_v7', JSON.stringify(Core.db)); }
+        function switchThread(id) { Core.db.active = id; renderAll(); }
+        function toggleConfig() { document.getElementById('config-modal').classList.toggle('hidden'); }
+        function saveConfig() { Core.db.key = document.getElementById('api-key-field').value; persist(); toggleConfig(); }
+        function resizeInput(el) { el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
