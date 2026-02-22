@@ -3,273 +3,642 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Joone Studio | Zero-Cost Ultra v7.0</title>
-    
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src https://fonts.gstatic.com;">
+    <title>Studio | Enterprise AI Nexus</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=JetBrains+Mono&display=swap');
-        
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Fira+Code:wght@400;600&display=swap');
+
+        /* === CORE VARIABLES === */
         :root {
-            --studio-blue: #00f2ff;
-            --studio-purple: #7000ff;
-            --glass: rgba(10, 10, 10, 0.8);
+            --app-bg: #030305;
+            --panel-bg: #0a0a0f;
+            --accent: #00f2ff;
+            --accent-glow: rgba(0, 242, 255, 0.2);
+            --text-main: #f1f5f9;
+            --text-muted: #64748b;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --danger: #ef4444;
+            --success: #10b981;
         }
 
-        body { 
-            font-family: 'Space Grotesk', sans-serif; 
-            background: #050505; 
-            color: #e5e7eb;
+        /* === BASE STYLES === */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--app-bg);
+            color: var(--text-main);
+            /* Strict overflow lock */
             height: 100vh;
-            overflow: hidden;
+            width: 100vw;
+            margin: 0;
+            overflow: hidden; 
+            display: flex;
         }
 
-        /* The "Enterprise" Feel: Complex UI Elements */
-        .sidebar-glass { background: var(--glass); backdrop-filter: blur(40px); border-right: 1px solid rgba(255,255,255,0.05); }
-        .main-gradient { background: radial-gradient(circle at top right, rgba(112, 0, 255, 0.05), transparent); }
-        
-        /* Advanced Animations */
-        @keyframes sweep { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
-        .scanning::after {
-            content: ''; position: absolute; inset: 0;
-            background: linear-gradient(90deg, transparent, rgba(0, 242, 255, 0.1), transparent);
-            animation: sweep 2s infinite;
+        /* === TYPOGRAPHY & BRANDING === */
+        .brand-text {
+            font-weight: 800;
+            letter-spacing: -0.05em;
+            background: linear-gradient(135deg, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
+        .creator-badge {
+            font-size: 0.65rem;
+            font-weight: 800;
+            letter-spacing: 0.25em;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        /* === UI COMPONENTS === */
+        .glass-panel {
+            background: var(--panel-bg);
+            border-right: 1px solid var(--border-color);
+            position: relative;
+            z-index: 50;
+        }
+
+        .btn-primary {
+            background: var(--text-main);
+            color: var(--app-bg);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.2s ease;
+        }
+        .btn-primary:hover {
+            background: var(--accent);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+        .btn-primary:active {
+            transform: translateY(1px);
+        }
+
+        .btn-icon {
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+            border-radius: 0.75rem;
+            padding: 0.5rem;
+        }
+        .btn-icon:hover {
+            color: var(--text-main);
+            background: rgba(255,255,255,0.05);
+        }
+
+        .input-area {
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        .input-area:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 30px var(--accent-glow);
+        }
+
+        /* === CHAT MESSAGES === */
+        .msg-container {
+            animation: fadeIn 0.3s ease-out forwards;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        @keyframes fadeIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .msg-user {
+            background: #151520;
+            border: 1px solid var(--border-color);
+            border-bottom-right-radius: 4px;
+        }
+
+        /* === MARKDOWN & CODE BLOCKS === */
         .prose pre {
             background: #000 !important;
-            border: 1px solid rgba(0, 242, 255, 0.2);
-            border-radius: 1rem;
-            padding: 1.25rem;
+            border: 1px solid #1e1e26;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
             position: relative;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+        }
+        
+        .code-header {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            background: #111;
+            padding: 0.4rem 1rem;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            border-bottom: 1px solid #1e1e26;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        /* File Upload Chip Styling */
-        .file-chip {
-            background: linear-gradient(to right, #111, #1a1a1a);
-            border: 1px solid rgba(255,255,255,0.1);
-            animation: fadeIn 0.3s ease-out;
+        .copy-btn {
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: color 0.2s;
         }
+        .copy-btn:hover { color: var(--accent); }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* === SCROLLBAR === */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #1e1e26; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+        
+        /* === UTILITIES === */
+        .hidden { display: none !important; }
+        .typing-dot {
+            width: 6px; height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes pulse { 0%, 100% { transform: scale(0.5); opacity: 0.5; } 50% { transform: scale(1.2); opacity: 1; } }
     </style>
 </head>
 <body>
 
-    <div class="flex h-screen w-full relative">
-        
-        <aside class="w-72 sidebar-glass hidden md:flex flex-col z-20">
-            <div class="p-6">
-                <div class="flex items-center gap-3 mb-8">
-                    <div class="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-lg flex items-center justify-center text-black font-black">JS</div>
-                    <h1 class="font-bold tracking-tighter text-xl">JOONE STUDIO</h1>
+    <aside class="w-80 h-full flex flex-col glass-panel shrink-0">
+        <div class="p-8 shrink-0">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="w-8 h-8 rounded-lg bg-white flex items-center justify-center">
+                    <svg class="w-5 h-5 text-black" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
                 </div>
-
-                <button onclick="newThread()" class="w-full flex items-center justify-center gap-2 py-3 bg-white text-black rounded-xl font-bold hover:bg-cyan-400 transition-all shadow-lg shadow-cyan-500/10">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-width="2" stroke-linecap="round"/></svg>
-                    New Thread
-                </button>
+                <h1 class="brand-text text-2xl">STUDIO</h1>
             </div>
-
-            <div class="px-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Memory Clusters</div>
-            <div id="thread-list" class="flex-1 overflow-y-auto px-2 space-y-1">
-                </div>
-
-            <div class="p-4 border-t border-white/5">
-                <div class="bg-blue-500/5 p-4 rounded-2xl border border-blue-500/10">
-                    <p class="text-[10px] font-bold text-blue-400 uppercase">Credit Status</p>
-                    <div class="flex items-center gap-2 mt-1">
-                        <div class="h-1.5 flex-1 bg-gray-800 rounded-full overflow-hidden">
-                            <div class="h-full bg-blue-500 w-[100%]"></div>
-                        </div>
-                        <span class="text-[10px] font-bold italic">FREE TIER</span>
-                    </div>
-                </div>
-            </div>
-        </aside>
-
-        <main class="flex-1 flex flex-col main-gradient relative">
+            <p class="creator-badge">Authored by Joone Ghadiyali</p>
             
-            <header class="h-16 flex items-center justify-between px-8 border-b border-white/5 bg-black/20">
-                <div class="flex items-center gap-4">
-                    <div class="flex items-center gap-2 px-3 py-1.5 bg-gray-900 rounded-full border border-white/10">
-                        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                        <select id="engine-select" class="bg-transparent text-[10px] font-black uppercase tracking-widest outline-none cursor-pointer">
-                            <option value="google/gemini-2.0-flash-lite-preview:free">Gemini Flash (Free)</option>
-                            <option value="mistralai/mistral-7b-instruct:free">Mistral 7B (Free)</option>
-                            <option value="meta-llama/llama-3-8b-instruct:free">Llama 3 (Free)</option>
-                            <option value="openchat/openchat-7b:free">OpenChat (Free)</option>
-                        </select>
+            <button id="btn-new-chat" class="mt-8 w-full group relative px-6 py-4 btn-primary rounded-xl flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                Initialize Thread
+            </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto px-4" id="history-container">
+            </div>
+
+        <div class="p-6 border-t border-white/5 bg-black/40 shrink-0">
+            <button id="btn-export-chat" class="flex items-center gap-3 text-xs font-bold text-gray-500 hover:text-white transition-all w-full text-left">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                EXPORT LOGS
+            </button>
+        </div>
+    </aside>
+
+    <main class="flex-1 h-full flex flex-col relative bg-[#030305] min-w-0">
+        
+        <header class="h-20 shrink-0 flex items-center justify-between px-10 border-b border-white/5 z-40 bg-black/50 backdrop-blur-md">
+            <div class="flex items-center gap-6">
+                <div class="bg-[#0a0a0f] border border-white/10 px-4 py-2 rounded-xl flex items-center gap-3">
+                    <div class="w-2 h-2 bg-cyan-400 rounded-full animate-pulse shadow-[0_0_8px_cyan]"></div>
+                    <select id="model-selector" class="bg-transparent text-[10px] font-black uppercase tracking-widest text-gray-300 outline-none cursor-pointer appearance-none">
+                        <option value="google/gemini-2.0-flash-lite-preview:free">Gemini 2.0 Flash (Free)</option>
+                        <option value="meta-llama/llama-3.3-70b-instruct:free">Llama 3.3 70B (Free)</option>
+                        <option value="qwen/qwen-2.5-72b-instruct:free">Qwen 2.5 72B (Free)</option>
+                        <option value="mistralai/mistral-7b-instruct:free">Mistral 7B (Free)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <button id="btn-clear-chat" class="text-[10px] font-black text-red-500/60 uppercase hover:text-red-500 transition-all tracking-widest">Flush Data</button>
+                <div class="w-[1px] h-4 bg-white/10"></div>
+                <div id="status-indicator" class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Awaiting Input</div>
+            </div>
+        </header>
+
+        <div id="chat-viewport" class="flex-1 overflow-y-auto p-8 lg:p-20 space-y-12 scroll-smooth">
+            <div id="welcome-screen" class="h-full flex flex-col items-center justify-center text-center">
+                <div class="w-24 h-24 mb-8 relative">
+                    <div class="absolute inset-0 bg-cyan-500 blur-[50px] opacity-20 animate-pulse"></div>
+                    <svg class="relative w-full h-full text-white opacity-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+                </div>
+                <h2 class="text-5xl font-black brand-text mb-6">Terminal Online.</h2>
+                <p class="text-gray-500 max-w-md text-sm font-medium leading-relaxed">Enterprise environment initialized. Layout locked. Gateway hardcoded.</p>
+            </div>
+        </div>
+
+        <div class="shrink-0 p-8 pt-4 bg-[#030305] border-t border-white/5">
+            <div class="max-w-5xl mx-auto">
+                <div id="attachment-tray" class="flex gap-2 mb-3 px-4"></div>
+                
+                <div class="input-area p-2 flex items-end gap-2">
+                    <div class="flex flex-col justify-end pb-1 pl-2">
+                        <input type="file" id="file-upload-input" class="hidden" multiple>
+                        <button id="btn-trigger-file" class="btn-icon">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                        </button>
+                    </div>
+
+                    <textarea id="main-textarea" rows="1" placeholder="Compile instructions..." class="w-full bg-transparent px-4 py-4 outline-none text-[15px] font-medium resize-none placeholder-gray-700 leading-relaxed max-h-60 overflow-y-auto"></textarea>
+                    
+                    <div class="pb-1 pr-1">
+                        <button id="btn-send-msg" class="bg-white text-black h-12 px-8 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-cyan-400 transition-all shadow-lg flex items-center justify-center">
+                            Run
+                        </button>
                     </div>
                 </div>
                 
-                <button onclick="toggleConfig()" class="p-2 text-gray-400 hover:text-white transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" stroke-width="2" stroke-linecap="round"/></svg>
-                </button>
-            </header>
-
-            <div id="canvas" class="flex-1 overflow-y-auto p-6 md:p-12 space-y-10 scroll-smooth">
-                </div>
-
-            <div class="p-6 md:p-10">
-                <div class="max-w-4xl mx-auto">
-                    <div id="file-tray" class="flex flex-wrap gap-2 mb-4"></div>
-
-                    <div class="relative bg-[#0d0d0d] border border-white/10 rounded-3xl p-2 focus-within:border-cyan-500/50 transition-all shadow-2xl">
-                        <textarea id="main-input" rows="1" placeholder="Type a message or drop files..." class="w-full bg-transparent p-4 outline-none resize-none font-medium pr-20" oninput="resizeInput(this)"></textarea>
-                        
-                        <div class="absolute right-4 bottom-4 flex items-center gap-2">
-                            <input type="file" id="upload-gate" class="hidden" multiple onchange="handleUpload(this.files)">
-                            <button onclick="document.getElementById('upload-gate').click()" class="p-2 text-gray-500 hover:text-cyan-400">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" stroke-width="2" stroke-linecap="round"/></svg>
-                            </button>
-                            <button onclick="launchRequest()" class="bg-white text-black p-3 rounded-2xl hover:bg-cyan-400 transition-all active:scale-90">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke-width="3" stroke-linecap="round"/></svg>
-                            </button>
-                        </div>
-                    </div>
+                <div class="flex justify-between items-center mt-4 px-6">
+                    <p class="text-[9px] font-black text-gray-600 uppercase tracking-[0.3em]">Enter to send • Shift+Enter for newline</p>
+                    <p class="text-[9px] font-black text-cyan-500/50 uppercase tracking-[0.3em]">Edition v12.0 • Locked Frame</p>
                 </div>
             </div>
-        </main>
-    </div>
-
-    <div id="config-modal" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-xl flex items-center justify-center p-6">
-        <div class="bg-[#111] border border-white/10 w-full max-w-md rounded-[2.5rem] p-10">
-            <h2 class="text-2xl font-bold mb-6 italic underline decoration-cyan-500">System Link</h2>
-            <div class="space-y-4">
-                <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">OpenRouter Key</label>
-                <input type="password" id="api-key-field" class="w-full bg-black border border-white/10 p-4 rounded-xl outline-none focus:border-cyan-500 transition-all" placeholder="Enter key for free model access...">
-            </div>
-            <button onclick="saveConfig()" class="w-full mt-8 py-4 bg-cyan-500 text-black font-bold rounded-xl shadow-lg shadow-cyan-500/20">Sync Neural Link</button>
-            <button onclick="toggleConfig()" class="w-full mt-2 text-gray-500 text-sm font-bold">Dismiss</button>
         </div>
-    </div>
+    </main>
 
     <script>
-        const Core = {
-            db: JSON.parse(localStorage.getItem('joone_v7')) || { threads: [], active: null, key: '' },
-            isBusy: false,
-            files: []
-        };
+        const App = (function() {
+            
+            // --- STATE MANAGEMENT ---
+            const State = {
+                data: {
+                    sessions: [],
+                    activeId: null,
+                    systemPrompt: 'You are an expert software architect and coding assistant.'
+                },
+                apiKey: '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', // Hardcoded
+                isGenerating: false,
+                
+                init() {
+                    const saved = localStorage.getItem('joone_enterprise_v12');
+                    if (saved) {
+                        try {
+                            this.data = { ...this.data, ...JSON.parse(saved) };
+                        } catch (e) {
+                            console.error('Storage corrupt. Resetting.');
+                        }
+                    }
+                    if (this.data.sessions.length === 0) {
+                        this.createSession();
+                    } else if (!this.data.activeId) {
+                        this.data.activeId = this.data.sessions[0].id;
+                    }
+                },
+                
+                save() {
+                    localStorage.setItem('joone_enterprise_v12', JSON.stringify(this.data));
+                },
 
-        function init() {
-            if(!Core.db.threads.length) newThread();
-            else Core.db.active = Core.db.threads[0].id;
-            document.getElementById('api-key-field').value = Core.db.key;
-            renderAll();
-        }
+                createSession() {
+                    const newSession = {
+                        id: 'thread_' + Date.now().toString(36),
+                        title: 'New Encrypted Thread',
+                        history: [],
+                        created: new Date().toISOString()
+                    };
+                    this.data.sessions.unshift(newSession);
+                    this.data.activeId = newSession.id;
+                    this.save();
+                    return newSession;
+                },
 
-        function newThread() {
-            const id = 'th_'+Date.now();
-            Core.db.threads.unshift({ id, title: 'Blank Slate', msgs: [] });
-            Core.db.active = id;
-            persist(); renderAll();
-        }
+                getActiveSession() {
+                    return this.data.sessions.find(s => s.id === this.data.activeId);
+                },
 
-        function handleUpload(files) {
-            const tray = document.getElementById('file-tray');
-            for(let f of files) {
-                Core.files.push(f.name);
-                const chip = document.createElement('div');
-                chip.className = "file-chip flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-bold text-cyan-400";
-                chip.innerHTML = `<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-width="2"/></svg> ${f.name}`;
-                tray.appendChild(chip);
-            }
-        }
+                clearActive() {
+                    const session = this.getActiveSession();
+                    if(session) {
+                        session.history = [];
+                        session.title = 'Cleared Thread';
+                        this.save();
+                    }
+                }
+            };
 
-        async function launchRequest() {
-            const input = document.getElementById('main-input');
-            const txt = input.value.trim();
-            if(!txt || Core.isBusy || !Core.db.key) return;
+            // --- UI CONTROLLER ---
+            const UI = {
+                elements: {
+                    chatViewport: document.getElementById('chat-viewport'),
+                    welcomeScreen: document.getElementById('welcome-screen'),
+                    historyContainer: document.getElementById('history-container'),
+                    mainTextarea: document.getElementById('main-textarea'),
+                    statusIndicator: document.getElementById('status-indicator'),
+                    modelSelector: document.getElementById('model-selector')
+                },
 
-            const thread = Core.db.threads.find(t => t.id === Core.db.active);
-            thread.msgs.push({ role: 'user', content: txt, attachments: [...Core.files] });
-            const aiMsg = { role: 'assistant', content: '', type: 'text' };
-            thread.msgs.push(aiMsg);
+                autoResizeTextarea() {
+                    const el = this.elements.mainTextarea;
+                    el.style.height = 'auto';
+                    el.style.height = (el.scrollHeight) + 'px';
+                },
 
-            input.value = ''; input.style.height = 'auto';
-            document.getElementById('file-tray').innerHTML = '';
-            Core.files = []; Core.isBusy = true;
-            renderChat();
+                setStatus(text, type = 'normal') {
+                    this.elements.statusIndicator.textContent = text;
+                    this.elements.statusIndicator.style.color = type === 'error' ? 'var(--danger)' : 
+                                                               type === 'active' ? 'var(--accent)' : 'var(--text-muted)';
+                },
 
-            try {
-                const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${Core.db.key}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        model: document.getElementById('engine-select').value,
-                        messages: thread.msgs.slice(0,-1).map(m => ({ role: m.role, content: m.content })),
-                        stream: true
-                    })
-                });
+                renderSidebar() {
+                    this.elements.historyContainer.innerHTML = '';
+                    State.data.sessions.forEach(session => {
+                        const div = document.createElement('div');
+                        const isActive = session.id === State.data.activeId;
+                        
+                        div.className = `p-4 mb-2 rounded-xl cursor-pointer transition-all border ${
+                            isActive 
+                            ? 'bg-cyan-500/10 border-cyan-500/30 text-white' 
+                            : 'bg-transparent border-transparent text-gray-500 hover:bg-white/5'
+                        }`;
+                        
+                        div.innerHTML = `
+                            <p class="text-[11px] font-black uppercase tracking-tight truncate">${session.title}</p>
+                            <p class="text-[8px] font-bold mt-1 uppercase opacity-50">${new Date(session.created).toLocaleDateString()}</p>
+                        `;
+                        
+                        div.addEventListener('click', () => {
+                            if(!State.isGenerating) {
+                                State.data.activeId = session.id;
+                                State.save();
+                                this.renderSidebar();
+                                this.renderChat();
+                            }
+                        });
+                        
+                        this.elements.historyContainer.appendChild(div);
+                    });
+                },
 
-                const reader = res.body.getReader();
-                const decoder = new TextDecoder();
-                while(true) {
-                    const {done, value} = await reader.read();
-                    if(done) break;
-                    const chunk = decoder.decode(value);
-                    chunk.split('\n').forEach(line => {
-                        if(line.startsWith('data: ')) {
-                            try {
-                                const payload = JSON.parse(line.substring(6));
-                                aiMsg.content += payload.choices[0].delta.content || '';
-                                streamUI(aiMsg.content);
-                            } catch(e) {}
+                renderChat() {
+                    const session = State.getActiveSession();
+                    const view = this.elements.chatViewport;
+                    
+                    if (session.history.length === 0) {
+                        this.elements.welcomeScreen.classList.remove('hidden');
+                        Array.from(view.children).forEach(child => {
+                            if(child.id !== 'welcome-screen') child.remove();
+                        });
+                        return;
+                    }
+
+                    this.elements.welcomeScreen.classList.add('hidden');
+                    Array.from(view.children).forEach(child => {
+                        if(child.id !== 'welcome-screen') child.remove();
+                    });
+
+                    session.history.forEach(msg => {
+                        const wrapper = document.createElement('div');
+                        wrapper.className = `msg-container flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`;
+                        
+                        const bubble = document.createElement('div');
+                        if (msg.role === 'user') {
+                            bubble.className = 'max-w-[75%] msg-user p-6 rounded-3xl';
+                            bubble.innerHTML = `<p class="font-medium text-sm leading-relaxed">${this.escapeHTML(msg.content)}</p>`;
+                        } else {
+                            bubble.className = 'max-w-[90%] prose prose-invert ai-response-target w-full';
+                            bubble.innerHTML = marked.parse(msg.content || '');
+                        }
+                        
+                        wrapper.appendChild(bubble);
+                        view.appendChild(wrapper);
+                    });
+
+                    this.applyCodeHighlighter();
+                    this.scrollToBottom();
+                },
+
+                appendTempAssistantMessage() {
+                    this.elements.welcomeScreen.classList.add('hidden');
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'msg-container flex justify-start';
+                    wrapper.innerHTML = `
+                        <div class="max-w-[90%] prose prose-invert ai-response-target w-full" id="active-stream-target">
+                            <div class="flex gap-2 items-center p-4">
+                                <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
+                            </div>
+                        </div>
+                    `;
+                    this.elements.chatViewport.appendChild(wrapper);
+                    this.scrollToBottom();
+                },
+
+                updateStream(markdownText) {
+                    const target = document.getElementById('active-stream-target');
+                    if (target) {
+                        target.innerHTML = marked.parse(markdownText);
+                        this.applyCodeHighlighter(target);
+                        this.scrollToBottom();
+                    }
+                },
+
+                applyCodeHighlighter(container = document) {
+                    container.querySelectorAll('pre code').forEach((block) => {
+                        hljs.highlightElement(block);
+                        const pre = block.parentElement;
+                        if (!pre.querySelector('.copy-btn')) {
+                            pre.style.paddingTop = '2.5rem';
+                            const header = document.createElement('div');
+                            header.className = 'code-header';
+                            
+                            const lang = document.createElement('span');
+                            lang.className = 'text-[10px] text-gray-500 font-bold uppercase';
+                            lang.textContent = block.className.replace('hljs language-', '').split(' ')[0] || 'code';
+                            
+                            const copyBtn = document.createElement('button');
+                            copyBtn.className = 'copy-btn';
+                            copyBtn.textContent = 'Copy';
+                            
+                            copyBtn.addEventListener('click', () => {
+                                navigator.clipboard.writeText(block.innerText);
+                                copyBtn.textContent = 'Copied!';
+                                setTimeout(() => copyBtn.textContent = 'Copy', 2000);
+                            });
+
+                            header.appendChild(lang);
+                            header.appendChild(copyBtn);
+                            pre.appendChild(header);
                         }
                     });
+                },
+
+                scrollToBottom() {
+                    const view = this.elements.chatViewport;
+                    view.scrollTop = view.scrollHeight;
+                },
+
+                escapeHTML(str) {
+                    return str.replace(/[&<>'"]/g, 
+                        tag => ({
+                            '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+                        }[tag] || tag)
+                    );
                 }
-            } catch(e) { aiMsg.content = "Connection refused. Check API key and network."; }
-            finally { 
-                Core.isBusy = false; 
-                if(thread.msgs.length === 2) thread.title = txt.substring(0, 20);
-                persist(); 
-            }
-        }
+            };
 
-        function streamUI(txt) {
-            const bubbles = document.querySelectorAll('.ai-bubble');
-            const last = bubbles[bubbles.length-1];
-            if(last) {
-                last.innerHTML = marked.parse(txt);
-                document.getElementById('canvas').scrollTop = document.getElementById('canvas').scrollHeight;
-                hljs.highlightAll();
-            }
-        }
+            // --- NETWORK CONTROLLER ---
+            const API = {
+                async transmit(text) {
+                    const session = State.getActiveSession();
+                    
+                    if (session.history.length === 0) {
+                        session.title = text.substring(0, 25).toUpperCase() + '...';
+                        UI.renderSidebar();
+                    }
 
-        function renderChat() {
-            const canvas = document.getElementById('canvas');
-            const thread = Core.db.threads.find(t => t.id === Core.db.active);
-            canvas.innerHTML = thread.msgs.map(m => `
-                <div class="flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}">
-                    <div class="${m.role === 'user' ? 'max-w-[80%] bg-[#111] border border-white/5 p-6 rounded-3xl rounded-br-none' : 'max-w-[90%] prose prose-invert ai-bubble'}">
-                        ${m.role === 'user' ? m.content : marked.parse(m.content || '...')}
-                    </div>
-                </div>
-            `).join('');
-            canvas.scrollTop = canvas.scrollHeight;
-            hljs.highlightAll();
-        }
+                    session.history.push({ role: 'user', content: text });
+                    UI.renderChat();
+                    
+                    State.isGenerating = true;
+                    UI.elements.mainTextarea.value = '';
+                    UI.autoResizeTextarea();
+                    UI.setStatus('Compiling Output...', 'active');
+                    UI.appendTempAssistantMessage();
 
-        function renderSidebar() {
-            document.getElementById('thread-list').innerHTML = Core.db.threads.map(t => `
-                <div onclick="switchThread('${t.id}')" class="p-3 rounded-xl cursor-pointer truncate text-[11px] font-bold uppercase tracking-tighter transition-all ${t.id === Core.db.active ? 'bg-white/5 text-cyan-400 border border-white/10' : 'text-gray-500 hover:text-white'}">
-                    ${t.title}
-                </div>
-            `).join('');
-        }
+                    const messages = [
+                        { role: 'system', content: State.data.systemPrompt },
+                        ...session.history
+                    ];
 
-        function renderAll() { renderSidebar(); renderChat(); }
-        function persist() { localStorage.setItem('joone_v7', JSON.stringify(Core.db)); }
-        function switchThread(id) { Core.db.active = id; renderAll(); }
-        function toggleConfig() { document.getElementById('config-modal').classList.toggle('hidden'); }
-        function saveConfig() { Core.db.key = document.getElementById('api-key-field').value; persist(); toggleConfig(); }
-        function resizeInput(el) { el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; }
+                    let generatedContent = '';
 
-        window.onload = init;
+                    try {
+                        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${State.apiKey}`,
+                                'Content-Type': 'application/json',
+                                'HTTP-Referer': window.location.href,
+                                'X-Title': 'Studio Enterprise'
+                            },
+                            body: JSON.stringify({
+                                model: UI.elements.modelSelector.value,
+                                messages: messages,
+                                stream: true
+                            })
+                        });
+
+                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                        const reader = response.body.getReader();
+                        const decoder = new TextDecoder();
+
+                        while (true) {
+                            const { done, value } = await reader.read();
+                            if (done) break;
+                            
+                            const chunk = decoder.decode(value);
+                            const lines = chunk.split('\n');
+                            
+                            for (const line of lines) {
+                                if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+                                    try {
+                                        const payload = JSON.parse(line.substring(6));
+                                        const delta = payload.choices[0].delta.content || '';
+                                        generatedContent += delta;
+                                        UI.updateStream(generatedContent);
+                                    } catch (e) {}
+                                }
+                            }
+                        }
+
+                        session.history.push({ role: 'assistant', content: generatedContent });
+                        State.save();
+
+                    } catch (error) {
+                        console.error('API Pipeline Failure:', error);
+                        UI.updateStream(`**ERROR: Protocol Violation.**\n\nConnection failed. Please check network status or API key validity.`);
+                    } finally {
+                        State.isGenerating = false;
+                        document.getElementById('active-stream-target')?.removeAttribute('id');
+                        UI.setStatus('Awaiting Input');
+                        UI.applyCodeHighlighter();
+                    }
+                }
+            };
+
+            // --- EVENT BINDER ---
+            const BindEvents = function() {
+                UI.elements.mainTextarea.addEventListener('input', () => UI.autoResizeTextarea());
+
+                UI.elements.mainTextarea.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        const text = UI.elements.mainTextarea.value.trim();
+                        if (text && !State.isGenerating) API.transmit(text);
+                    }
+                });
+
+                document.getElementById('btn-send-msg').addEventListener('click', () => {
+                    const text = UI.elements.mainTextarea.value.trim();
+                    if (text && !State.isGenerating) API.transmit(text);
+                });
+
+                document.getElementById('btn-new-chat').addEventListener('click', () => {
+                    if(!State.isGenerating) {
+                        State.createSession();
+                        UI.renderSidebar();
+                        UI.renderChat();
+                    }
+                });
+
+                document.getElementById('btn-clear-chat').addEventListener('click', () => {
+                    if(!State.isGenerating) {
+                        State.clearActive();
+                        UI.renderChat();
+                    }
+                });
+
+                document.getElementById('btn-trigger-file').addEventListener('click', () => {
+                    document.getElementById('file-upload-input').click();
+                });
+
+                document.getElementById('btn-export-chat').addEventListener('click', () => {
+                    const session = State.getActiveSession();
+                    if (!session || session.history.length === 0) return alert('No data to export.');
+                    
+                    let exportTxt = `# ${session.title}\n\n`;
+                    session.history.forEach(msg => {
+                        exportTxt += `### ${msg.role.toUpperCase()}\n${msg.content}\n\n---\n\n`;
+                    });
+
+                    const blob = new Blob([exportTxt], { type: 'text/markdown' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `export_${Date.now()}.md`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                });
+            };
+
+            // --- INITIALIZATION ---
+            return {
+                start() {
+                    console.log("Enterprise v12.0 Initializing...");
+                    State.init();
+                    UI.renderSidebar();
+                    UI.renderChat();
+                    BindEvents();
+                }
+            };
+
+        })();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            App.start();
+        });
     </script>
 </body>
 </html>
